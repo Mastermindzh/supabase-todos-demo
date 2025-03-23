@@ -1,0 +1,26 @@
+{
+  "deno.enable": true,
+  "cSpell.words": [
+    "Introspector",
+    "Isolationlevel",
+    "Kysely",
+    "pooler",
+    "supabase"
+  ],
+  "files.exclude": {
+    "supabase/.{branches,temp}": true
+  },
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "127.0.0.1",
+      "port": 54322,
+      "driver": "PostgreSQL",
+      "name": "local postgres",
+      "group": "local",
+      "database": "postgres",
+      "username": "postgres",
+      "password": "postgres"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+[functions.getTodosByName]
+enabled = true
+verify_jwt = true
+import_map = "./functions/getTodosByName/deno.json"
+entrypoint = "./functions/getTodosByName/index.ts"
+
+[functions.getSharedTasks]
+enabled = true
+verify_jwt = true
+import_map = "./functions/getSharedTasks/deno.json"
+entrypoint = "./functions/getSharedTasks/index.ts"
+
