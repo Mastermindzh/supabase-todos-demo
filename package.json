@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "supabase functions serve --env-file ./supabase/.env",
+    "start-otel-collector": "docker run --rm -p 4318:4318 -v $(pwd)/otel-config.yml:/etc/otelcol/config.yaml otel/opentelemetry-collector:latest",
     "deps": "supabase start --ignore-health-check || true"
   },
   "author": "",

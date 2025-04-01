@@ -17,3 +17,6 @@ export type {
 
 // Exporting from deno-postgres-driver
 export { Pool, PoolClient } from "https://deno.land/x/postgres@v0.19.3/mod.ts";
+
+// otel logs
+export { trace, context } from "npm:@opentelemetry/api";

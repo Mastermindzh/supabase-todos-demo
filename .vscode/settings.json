@@ -4,6 +4,7 @@
     "Introspector",
     "Isolationlevel",
     "Kysely",
+    "Millis",
     "pooler",
     "supabase"
   ],
