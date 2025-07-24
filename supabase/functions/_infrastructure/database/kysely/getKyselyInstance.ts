@@ -16,19 +16,48 @@ type LogObject = {
   error?: string;
 };
 
+type LogEvent = {
+  level: "query" | "error";
+  query: {
+    sql: string;
+    parameters: readonly unknown[];
+  };
+  queryDurationMillis: number;
+  error?: unknown;
+};
+
+// Global pool instance - created once per function instance
+let globalPool: Pool | null = null;
+
+const getPool = (connectionString?: string): Pool => {
+  if (!globalPool) {
+    const useCustomConnectionString =
+      Deno.env.get("USE_CUSTOM_CONNECTION_STRING") === "true";
+    const supabaseConnectionUrl = Deno.env.get("SUPABASE_DB_URL") ?? "";
+    const customConnectionUrl = Deno.env.get("POSTGRES_DB_URL") ?? "";
+
+    globalPool = new Pool(
+      connectionString ??
+        (useCustomConnectionString
+          ? customConnectionUrl
+          : supabaseConnectionUrl),
+      parseInt(Deno.env.get("POSTGRES_POOL_SIZE") ?? "2", 10),
+      Deno.env.get("POSTGRES_POOL_LAZY") === "true"
+    );
+  }
+
+  return globalPool;
+};
+
 /**
  * get a kysely instance backed by the database definition
- * @param connectionString if empty, will use Deno.env.get("POSTGRES_CONNECTION_STRING")
+ * @param connectionString if empty, will use Deno.env.get("SUPABASE_DB_URL")
  * @returns Kysely instance
  */
 export const getKyselyInstance = <Schema = Database>(
   connectionString?: string
 ) => {
-  const pool = new Pool(
-    connectionString ?? Deno.env.get("SUPABASE_DB_URL") ?? "",
-    3,
-    true
-  );
+  const pool = getPool(connectionString);
 
   return new Kysely<Schema>({
     dialect: {
@@ -46,20 +75,23 @@ export const getKyselyInstance = <Schema = Database>(
         return new PostgresQueryCompiler();
       },
     },
-    log(event) {
+    log(event: LogEvent) {
       const level = Deno.env.get("LOG_LEVEL") ?? "";
       const currentLevel = LogLevels[level];
       const logLevel = LogLevels["debug"];
 
       if (currentLevel > logLevel) {
+        if (event.level === "error") {
+          Logger.error("Query failed", { error: event.error });
+        }
         return;
       }
 
-      let logObject = {
+      let logObject: LogObject = {
         durationMs: event.queryDurationMillis,
         sql: event.query.sql.replaceAll('"', "'"),
         params: [],
-      } as LogObject;
+      };
 
       if (Deno.env.get("LOG_PARAMETERS") === "true") {
         logObject = { ...logObject, params: event.query.parameters };
@@ -72,4 +104,14 @@ export const getKyselyInstance = <Schema = Database>(
       }
     },
   });
+};
+
+/**
+ * Only use this if you know what you are doing
+ */
+export const closePool = async () => {
+  if (globalPool) {
+    await globalPool.end();
+    globalPool = null;
+  }
 };
