@@ -1,3 +1,6 @@
+import { WinstonLogLevel } from "../Logger.ts";
+import { getOtelLogLevel } from "./WinstonToOtel.ts";
+
 /**
  * OtelHTTPTransport is a logging transport that sends logs
  * in OpenTelemetry (OTLP) format to a remote HTTP endpoint.
@@ -34,7 +37,7 @@ export class OtelHTTPTransport {
    * @returns {Promise<void>} A Promise that resolves when the log is sent or logs a warning on failure.
    */
   async send(
-    level: string,
+    level: WinstonLogLevel,
     message: string,
     payload: Record<string, unknown>
   ): Promise<void> {
@@ -44,6 +47,8 @@ export class OtelHTTPTransport {
       key,
       value: { stringValue: String(value) },
     }));
+
+    const { severityNumber, severityText } = getOtelLogLevel(level);
 
     const body = {
       resourceLogs: [
@@ -59,7 +64,8 @@ export class OtelHTTPTransport {
               logRecords: [
                 {
                   timeUnixNano: String(timestamp),
-                  severityText: level.toUpperCase(),
+                  severityText,
+                  severityNumber,
                   body: { stringValue: message },
                   attributes,
                 },

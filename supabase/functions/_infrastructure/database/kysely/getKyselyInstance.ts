@@ -7,7 +7,7 @@ import {
   PostgresQueryCompiler,
 } from "../../../deps.ts";
 import { PostgresDriver } from "../deno-postgres-driver/postgresDriver.ts";
-import { Logger, LogLevels } from "../../logging/Logger.ts";
+import { Logger, LogLevels, WinstonLogLevel } from "../../logging/Logger.ts";
 
 type LogObject = {
   durationMs: number;
@@ -77,7 +77,7 @@ export const getKyselyInstance = <Schema = Database>(
     },
     log(event: LogEvent) {
       const level = Deno.env.get("LOG_LEVEL") ?? "";
-      const currentLevel = LogLevels[level];
+      const currentLevel = LogLevels[level as WinstonLogLevel];
       const logLevel = LogLevels["debug"];
 
       if (currentLevel > logLevel) {
