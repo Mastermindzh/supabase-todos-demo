@@ -42,6 +42,12 @@ export class PostgresDriver implements Driver {
     let connection = this.#connections.get(client);
 
     if (!connection) {
+      if (this.#config.rls?.currentUserId) {
+        await client.queryArray(
+          `SET app.current_user_id = '${this.#config.rls.currentUserId}'`
+        );
+      }
+
       connection = new PostgresConnection(client);
       this.#connections.set(client, connection);
     }

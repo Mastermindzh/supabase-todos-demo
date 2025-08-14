@@ -48,6 +48,14 @@ const getPool = (connectionString?: string): Pool => {
 
   return globalPool;
 };
+type RlsContext = {
+  currentUserId: string;
+};
+
+type KyselyConfig = {
+  connectionString?: string;
+  rls?: RlsContext; // Optional RLS configuration
+};
 
 /**
  * get a kysely instance backed by the database definition
@@ -55,7 +63,8 @@ const getPool = (connectionString?: string): Pool => {
  * @returns Kysely instance
  */
 export const getKyselyInstance = <Schema = Database>(
-  connectionString?: string
+  connectionString?: string,
+  currentUserId?: string
 ) => {
   const pool = getPool(connectionString);
 
@@ -65,8 +74,7 @@ export const getKyselyInstance = <Schema = Database>(
         return new PostgresAdapter();
       },
       createDriver() {
-        // this is our own, custom, deno-postgres driver
-        return new PostgresDriver({ pool });
+        return new PostgresDriver({ pool, rls });
       },
       createIntrospector(db: Kysely<Database>) {
         return new PostgresIntrospector(db);
