@@ -8,11 +8,20 @@ interface LogDetails {
   [key: string]: unknown;
 }
 
+export type WinstonLogLevel =
+  | "error"
+  | "warn"
+  | "info"
+  | "http"
+  | "verbose"
+  | "debug"
+  | "silly";
+
 /**
  * Defines log levels and their numeric severity.
  * Modelled after winston
  */
-export const LogLevels: Record<string, number> = {
+export const LogLevels: Record<WinstonLogLevel, number> = {
   error: 0,
   warn: 1,
   info: 2,
@@ -46,7 +55,8 @@ export class Logger {
     const otelEnabled = Deno.env.get("OTEL_ENABLED") === "true";
     const serviceName = "Business integration platform";
 
-    this.currentLevel = LogLevels[configuredLevel] ?? LogLevels["info"];
+    this.currentLevel =
+      LogLevels[configuredLevel as WinstonLogLevel] ?? LogLevels["info"];
     this.otelEnabled = otelEnabled;
 
     this.meta = {
@@ -91,7 +101,7 @@ export class Logger {
    * @param {string} level - The log level to check.
    * @returns {boolean} True if the level is within the configured threshold.
    */
-  private shouldLog(level: string): boolean {
+  private shouldLog(level: WinstonLogLevel): boolean {
     const levelNum = LogLevels[level];
     return levelNum !== undefined && levelNum <= this.currentLevel;
   }
@@ -103,7 +113,7 @@ export class Logger {
    * @param {string} message - The main log message.
    * @param {LogDetails} [details] - Optional additional metadata.
    */
-  private write(level: string, message: string, details?: LogDetails) {
+  private write(level: WinstonLogLevel, message: string, details?: LogDetails) {
     if (!this.shouldLog(level)) return;
 
     const span = trace.getSpan(context.active());
