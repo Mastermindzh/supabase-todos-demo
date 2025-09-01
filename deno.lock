@@ -1,8 +1,9 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
     "npm:@opentelemetry/api@*": "1.9.0",
     "npm:@types/node@*": "22.12.0",
+    "npm:k6@^0.0.0": "0.0.0",
     "npm:kysely@0.27.6": "0.27.6",
     "npm:winston@*": "3.17.0"
   },
@@ -80,6 +81,9 @@
     },
     "is-stream@2.0.1": {
       "integrity": "sha512-hFoiJiTl63nn+kstHGBtewWSKnQLpyb155KHheA1l39uvtO9nWIop1p3udqPcUd/xbF1VLMO4n7OI6p7RbngDg=="
+    },
+    "k6@0.0.0": {
+      "integrity": "sha512-GAQSWayS2+LjbH5bkRi+pMPYyP1JSp7o+4j58ANZ762N/RH/SdlAT3CHHztnn8s/xgg8kYNM24Gd2IPo9b5W+g=="
     },
     "kuler@2.0.0": {
       "integrity": "sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A=="
@@ -170,6 +174,13 @@
         "stack-trace",
         "triple-beam",
         "winston-transport"
+      ]
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:k6@^0.0.0"
       ]
     }
   }

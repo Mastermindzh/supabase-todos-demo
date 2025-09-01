@@ -105,13 +105,3 @@ export const getKyselyInstance = <Schema = Database>(
     },
   });
 };
-
-/**
- * Only use this if you know what you are doing
- */
-export const closePool = async () => {
-  if (globalPool) {
-    await globalPool.end();
-    globalPool = null;
-  }
-};
